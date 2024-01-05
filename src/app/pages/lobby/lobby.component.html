@@ -15,7 +15,7 @@
             <div class="column">{{ game.name }}</div>
             <div class="column">T: {{game.player1}} VS B: {{game.player2}}</div>
             <div class="column">Turn: {{game.states[game.states.length - 1].turn}} {{game.states[game.states.length - 1].player_turn}}</div>
-            <div class="column"><button class="button is-link">Open</button></div>
+            <div class="column"><button class="button is-link" (click)="openGame(game)">Open</button></div>
         </div>
     </div>
 

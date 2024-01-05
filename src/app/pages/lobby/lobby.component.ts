@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Game } from 'src/app/models/game.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { MessageResponse, SocketService } from 'src/app/services/socket.service';
@@ -20,6 +21,7 @@ export class LobbyComponent implements OnInit {
   public closedGames: Game[] = [];
 
   constructor(
+    private router: Router,
   ) { 
     this.newGameName = `Game-${Math.round(Math.random() * 1000)}`;
     SocketService.messages$.subscribe(this.messageParser)
@@ -118,6 +120,10 @@ export class LobbyComponent implements OnInit {
       this.newGameName.replace(" ", "-");
     }
     SocketService.sendMessage("newGame", "CONTROL CREATE " + this.newGameName);
+  }
+
+  openGame(game: Game) {
+    this.router.navigate(["game", game.name]);
   }
 
   myName() {

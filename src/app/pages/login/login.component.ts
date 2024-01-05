@@ -16,7 +16,8 @@ export class LoginComponent implements AfterViewInit {
   constructor(
     private router: Router,
   ) {
-    this.name = `Guest-${Math.round(Math.random() * 1000)}`;
+    // this.name = `Guest-${Math.round(Math.random() * 1000)}`;
+    this.name = `Guest-733`;
   }
   ngAfterViewInit(): void {
     setTimeout(() => { // Ensure this runs after Angular has updated the view
