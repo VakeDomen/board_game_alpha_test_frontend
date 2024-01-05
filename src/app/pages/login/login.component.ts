@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
-import { SocketService } from 'src/app/services/socket.service';
+import { MessageResponse, SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-login',
@@ -34,8 +34,8 @@ export class LoginComponent implements AfterViewInit {
     AuthService.logIn(this.name);
 
   }
-  private authMessageParser = (raw_message: string) => {
-    const message = JSON.parse(raw_message);
+  private authMessageParser = (response: MessageResponse) => {
+    const message = JSON.parse(response.data);
     if (message["Success"] == true) {
       this.router.navigate(["lobby"]); 
     }

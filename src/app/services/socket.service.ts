@@ -1,13 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
+export type MessageResponse = {
+  message: [string, string],
+  data: string,
+}
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
   private static socket: WebSocket | undefined;
-  private static messagesSubject = new Subject<string>(); // Subject to emit received messages
+  private static messagesSubject = new Subject<MessageResponse>(); // Subject to emit received messages
   public static messages$ = SocketService.messagesSubject.asObservable();
+  private static waitingMessage: [string, string] | undefined = undefined;
+
+  private static messageQue: [string, string][] = [];
 
   constructor() { }
 
@@ -16,12 +23,26 @@ export class SocketService {
 
     this.socket.onopen = event => {
       console.log('Connection opened:', event);
-      
     };
 
     this.socket.onmessage = event => {
-      console.log('Message from server:', event.data);
-      this.messagesSubject.next(event.data); // Emit the received message
+      if (SocketService.waitingMessage) {
+        this.messagesSubject.next({
+          message: SocketService.waitingMessage,
+          data: event.data
+        }); // Emit the received message
+        if (SocketService.messageQue.length) {
+          SocketService.waitingMessage = SocketService.messageQue.pop();
+          if (SocketService.waitingMessage) {
+            const message = SocketService.waitingMessage[1];
+            this.socket?.send(message);
+          }
+        } else {
+          SocketService.waitingMessage = undefined;
+        }
+      } else {
+        console.log("Socket que is broken");
+      }
     };
 
     this.socket.onclose = event => {
@@ -33,9 +54,15 @@ export class SocketService {
     };
   }
 
-  public static sendMessage(message: string): void {
+  public static sendMessage(id: string, message: string): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(message);
+      this.messageQue.push([id, message]);
+
+      if (!SocketService.waitingMessage) {
+        SocketService.waitingMessage = SocketService.messageQue.pop();
+        this.socket.send(message);
+      }
+
     } else {
       console.error('WebSocket is not connected.');
     }

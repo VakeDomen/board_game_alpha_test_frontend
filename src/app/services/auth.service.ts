@@ -5,8 +5,7 @@ import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
-  
+export class AuthService {  
   private static username: string | undefined;
 
   constructor(
@@ -15,14 +14,16 @@ export class AuthService {
    
   }
 
+  static getName() {
+    return AuthService.username;
+  }
+
   static isLoggedIn() {
     return !!AuthService.username;
   }
 
   static logIn(name: string) {
-    SocketService.sendMessage("CONTROL AUTH " + name);
+    SocketService.sendMessage("login", "CONTROL AUTH " + name);
     AuthService.username = name;
   }
-
-
 }

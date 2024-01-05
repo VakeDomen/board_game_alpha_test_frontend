@@ -1,1 +1,53 @@
-<p>lobby works!</p>
+<div class="container">
+    <div class="level mt-5">
+        <div class="level-left"><h1 class="title is-2">Lobby ({{ myName() }})</h1></div>
+        <div class="level-right">
+            <div>
+                <input type="text" class="input" [(ngModel)]="newGameName">
+                <button class="button is-link" (click)="createGame()">Create Game</button></div>
+            </div>
+    </div>
+
+    <h1 class="title is-3">Running games</h1>
+    <div class="box" *ngIf="!runningGames.length">No games currently running.</div>
+    <div class="box" *ngFor="let game of runningGames">
+        <div class="columns">
+            <div class="column">{{ game.name }}</div>
+            <div class="column">T: {{game.player1}} VS B: {{game.player2}}</div>
+            <div class="column">Turn: {{game.states[game.states.length - 1].turn}} {{game.states[game.states.length - 1].player_turn}}</div>
+            <div class="column"><button class="button is-link">Open</button></div>
+        </div>
+    </div>
+
+    <h1 class="title is-3">Open games</h1>
+    <div class="box" *ngIf="!openGames.length">No games to join. Create one.</div>
+    <div class="box" *ngFor="let game of openGames">
+        <div class="columns">
+            <div class="column">{{ game.name }}</div>
+            <div class="column">TECH: {{ game.player1 }}</div>
+            <div class="column">BUG: {{ game.player2 ?? "OPEN" }}</div>
+            <div class="column">
+                <div *ngIf="canJoin(game)">
+                    <button class="button is-link" (click)="joinGame(game)">Join game</button>
+                </div>
+                <div *ngIf="!canJoin(game) && !isHost(game)">
+                    <p>Waiting for game to start</p>
+                </div>
+                <div *ngIf="!canJoin(game) && isHost(game)">
+                    <div *ngIf="!!game.player2">
+                        <button class="button is-link" (click)="startGame(game)">Start game</button>
+                    </div>
+                    <div *ngIf="!game.player2">
+                        <p>Waiting for oponent to join</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h1 class="title is-3">Closed games</h1>
+    <div class="box" *ngIf="!closedGames.length">No games finnished yet.</div>
+    <div class="box" *ngFor="let game of closedGames">
+        {{ game.name }}
+    </div>
+</div>
