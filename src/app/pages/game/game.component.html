@@ -4,27 +4,28 @@
             <h1 class="title is-3">Game: {{ getGameName() }}</h1>
         </div>
         <div class="level-right">
-            <h1 class="title is-3">Turn: {{ getPlayerTurnLabel() }}</h1>
+            <h1 class="title is-3 is-blue" *ngIf="playerTurn=='First'">Turn: {{ labelPlayerTurn }}</h1>
+            <h1 class="title is-3 is-red" *ngIf="playerTurn=='Second'">Turn: {{ labelPlayerTurn }}</h1>
         </div>
     </div>
     <div class="level box has-text-centered-mobile">
-        <div class="level-item is-size-4 is-gray is-hidden-mobile" [ngClass]="{ 'is-higlighted': getPhase() == 'Setup' }">
+        <div class="level-item is-size-4 is-gray is-hidden is-hidden-mobile" [ngClass]="{ 'is-higlighted': phase == 'Setup' }">
             Setup Phase
         </div>
 
-        <div class="level-item is-size-4 is-gray is-hidden-mobile" [ngClass]="{ 'is-higlighted': getPhase() == 'Dmg' }">
+        <div class="level-item is-size-4 is-gray is-hidden-mobile" [ngClass]="{ 'is-higlighted': phase == 'Dmg' }">
             Damage Phase
         </div>
 
-        <div class="level-item is-size-4 is-gray is-hidden-mobile" [ngClass]="{ 'is-higlighted': getPhase() == 'Triggers' }">
+        <div class="level-item is-size-4 is-gray is-hidden-mobile" [ngClass]="{ 'is-higlighted': phase == 'Triggers' }">
             Triggers phase
         </div>
 
-        <div class="level-item is-size-4 is-gray is-hidden-mobile" [ngClass]="{ 'is-higlighted': getPhase() == 'Main' }">
+        <div class="level-item is-size-4 is-gray is-hidden-mobile" [ngClass]="{ 'is-higlighted': phase == 'Main' }">
             Main Phase
         </div>
 
-        <div class="level-item is-size-4 is-gray is-hidden-mobile" [ngClass]="{ 'is-higlighted': getPhase() == 'End' }">
+        <div class="level-item is-size-4 is-gray is-hidden-mobile" [ngClass]="{ 'is-higlighted': phase == 'End' }">
             End Phase
         </div>
     </div>
@@ -42,11 +43,11 @@
                     <button class="button is-link" (click)="nextPhase()">Next Phase</button>
                 </div>
             </div>
-            <app-phase-setup [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="getPhase() == 'Setup'"></app-phase-setup>
-            <app-phase-dmg [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="getPhase() == 'Dmg'"></app-phase-dmg>
-            <app-phase-triggers [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="getPhase() == 'Triggers'"></app-phase-triggers>
-            <app-phase-main [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="getPhase() == 'Main'"></app-phase-main>
-            <app-phase-end [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="getPhase() == 'End'"></app-phase-end>
+            <app-phase-setup [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Setup'"></app-phase-setup>
+            <app-phase-dmg [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Dmg'"></app-phase-dmg>
+            <app-phase-triggers [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Triggers'"></app-phase-triggers>
+            <app-phase-main [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Main'"></app-phase-main>
+            <app-phase-end [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'End'"></app-phase-end>
         </div>
     </div>
 </div>

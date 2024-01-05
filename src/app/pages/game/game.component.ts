@@ -16,6 +16,9 @@ export class GameComponent implements OnInit {
 
 
   public isReady = false;
+  public labelPlayerTurn: string = "";
+  public phase: string = "";
+  public playerTurn: string = "";
 
   public name: string | undefined;
   public wrapper: GameWrapper | undefined;
@@ -63,6 +66,10 @@ export class GameComponent implements OnInit {
     if (response.message[0] == "undo") {
       this.stateParser(response.data)
     }
+
+    if (response.message[0] == "nextPhase") {
+      this.stateParser(response.data);
+    }
   }
 
   recepiesParser(data: string) {
@@ -88,6 +95,11 @@ export class GameComponent implements OnInit {
     } as unknown as GameWrapper;
 
     const lastState = this.getLastState()
+    this.labelPlayerTurn = this.getPlayerTurnLabel();
+    this.phase = lastState?.turn_phase ?? "";
+    this.playerTurn = lastState?.player_turn ?? "";
+    
+    
     // revert possible already done moves on phase load
     // just to avoid wierd states
     if (!this.isReady && lastState && lastState.move_que.length > 0) {
@@ -95,6 +107,8 @@ export class GameComponent implements OnInit {
     } else {
       this.isReady = true;
     }
+
+    this.labelPlayerTurn = this.getPlayerTurnLabel();
   }
 
   getGameName(): string {
