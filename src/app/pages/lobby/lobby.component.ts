@@ -70,11 +70,9 @@ export class LobbyComponent implements OnInit {
 
   parseLobbyMessage(data: string) {
     this.openGames = JSON.parse(data)["Lobby"] ?? [];
-    console.log(this.openGames)
   }
   parseRunningMessage(data: string) {
     const games: Game[] = JSON.parse(data)["Running"];
-    console.log(games)
     if (games && games.length) {
       for (const game of games) {
         if (!!game.states[game.states.length - 1].winner) {

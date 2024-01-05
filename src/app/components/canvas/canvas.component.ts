@@ -30,7 +30,6 @@ export class CanvasComponent implements OnChanges {
 
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log("Changes", changes);
     if (changes['wrapper']) {
       this.renderGameState();
     }
@@ -118,7 +117,6 @@ export class CanvasComponent implements OnChanges {
 
   private renderGameState(): void {
     if (!this.wrapper || !this.context || !this.wrapper.game.states.length) {
-      console.error("No game wrapper, context, or states available.");
       return;
     }
 
@@ -154,7 +152,6 @@ export class CanvasComponent implements OnChanges {
   }
   private drawFoorptint(map: string[][]) {
     if (!this.wrapper || !this.wrapper.canvasState || !this.wrapper.canvasState.tile_selector || !this.context) {
-      console.log("Something not here", this.wrapper);
       return;
     }
     const rows = map.length;
@@ -163,7 +160,6 @@ export class CanvasComponent implements OnChanges {
     const tileWidth = this.canvasWidth / columns;
     const tileHeight = this.canvasHeight / rows;
 
-    console.log("shoud", footprint)
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < columns; col++) {
 
@@ -185,7 +181,6 @@ export class CanvasComponent implements OnChanges {
           this.context.strokeStyle = 'white';
           this.context.strokeRect(col * tileWidth, row * tileHeight, tileWidth, tileHeight);
         } else {
-          console.log("Drek")
           this.context.fillStyle = 'lightgrey';
         }
 

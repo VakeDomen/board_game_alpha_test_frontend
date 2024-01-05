@@ -51,13 +51,11 @@ export class GameComponent implements OnInit {
 
   recepiesParser(data: string) {
     this.recepies = JSON.parse(data)["TileRecepeies"] as TileRecipes;
-    console.log(this.recepies, JSON.parse(data));
     this.createWrapper();
   }
 
   stateParser(data: string) {
     this.game = JSON.parse(data)["State"] as Game;
-    console.log(this.game);
     this.createWrapper();
   }
 
@@ -74,7 +72,6 @@ export class GameComponent implements OnInit {
         recepies: this.recepies,
       } as unknown as GameWrapper;
       this.isReady = true;
-      console.log(this.wrapper)
     }
   }
 
@@ -128,9 +125,7 @@ export class GameComponent implements OnInit {
   }
 
   updateWrapper(newWrapper: GameWrapper) {
-    console.log("new wrapper", newWrapper)
     this.wrapper = {...newWrapper};
-    console.log("WWWW", this.wrapper)
   }
 
 }
