@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { DisplayState, GameWrapper } from 'src/app/models/game-wrapper.model';
 
 @Component({
   selector: 'app-phase-setup',
@@ -6,10 +7,27 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./phase-setup.component.sass']
 })
 export class PhaseSetupComponent implements OnInit {
-
+  
+  @Input() wrapper: GameWrapper | undefined;
+  @Output() wrapperUpdate = new EventEmitter<GameWrapper>();
+  
   constructor() { }
 
   ngOnInit(): void {
+    const state: DisplayState = {
+      display: 'footprint',
+      tile_selector: this.getLastState()?.player_turn == 'First' ? 'TechBase' : 'BugBase1',
+      tile_id: null
+    };
+    if (!this.wrapper) {
+      return
+    }
+    this.wrapper.canvasState = state;
+    this.wrapperUpdate.emit(this.wrapper);
   }
 
+
+  getLastState() {
+    return this.wrapper?.game.states[this.wrapper.game.states.length - 1]
+  }
 }

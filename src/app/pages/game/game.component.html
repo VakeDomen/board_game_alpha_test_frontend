@@ -34,11 +34,11 @@
             <app-canvas [wrapper]="wrapper"></app-canvas>
         </div>
         <div class="column is-half ">
-            <app-phase-setup class="stretch" *ngIf="getPhase() == 'Setup'"></app-phase-setup>
-            <app-phase-dmg class="stretch" *ngIf="getPhase() == 'Dmg'"></app-phase-dmg>
-            <app-phase-triggers class="stretch" *ngIf="getPhase() == 'Triggers'"></app-phase-triggers>
-            <app-phase-main class="stretch" *ngIf="getPhase() == 'Main'"></app-phase-main>
-            <app-phase-end class="stretch" *ngIf="getPhase() == 'End'"></app-phase-end>
+            <app-phase-setup [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="getPhase() == 'Setup'"></app-phase-setup>
+            <app-phase-dmg [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="getPhase() == 'Dmg'"></app-phase-dmg>
+            <app-phase-triggers [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="getPhase() == 'Triggers'"></app-phase-triggers>
+            <app-phase-main [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="getPhase() == 'Main'"></app-phase-main>
+            <app-phase-end [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="getPhase() == 'End'"></app-phase-end>
         </div>
     </div>
 </div>

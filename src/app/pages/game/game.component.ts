@@ -104,7 +104,6 @@ export class GameComponent implements OnInit {
     if (!this.wrapper) {
       return "End";
     }
-    console.log("Phase", this.wrapper.game.states[this.wrapper.game.states.length - 1].turn_phase);
     return this.wrapper.game.states[this.wrapper.game.states.length - 1].turn_phase;
   }
 
@@ -126,6 +125,12 @@ export class GameComponent implements OnInit {
 
   getLastState(): GameState | undefined {
     return this.wrapper?.game.states[this.wrapper.game.states.length - 1]
+  }
+
+  updateWrapper(newWrapper: GameWrapper) {
+    console.log("new wrapper", newWrapper)
+    this.wrapper = {...newWrapper};
+    console.log("WWWW", this.wrapper)
   }
 
 }
