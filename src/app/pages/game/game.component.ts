@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Tile } from 'src/app/components/canvas/canvas.component';
 import { GameWrapper } from 'src/app/models/game-wrapper.model';
 import { Game, GameState } from 'src/app/models/game.model';
 import { TileRecipes } from 'src/app/models/recepie.model';
+import { AuthService } from 'src/app/services/auth.service';
 import { MessageResponse, SocketService } from 'src/app/services/socket.service';
 
 @Component({
@@ -29,6 +31,8 @@ export class GameComponent implements OnInit {
       let name = params.get('name');
       if (!name) {
         this.router.navigate(["lobby"]);
+      } else {
+        this.name = name;
       }
       SocketService.sendMessage("state", "GAME " + name + " GetState");
       SocketService.sendMessage("recepies", "GAME " + name + " GetRecepies");
@@ -46,6 +50,18 @@ export class GameComponent implements OnInit {
 
     if (response.message[0] == "recepies") {
       this.recepiesParser(response.data);
+    }
+
+    if (response.message[0] == "baseSetup") {
+      SocketService.sendMessage("applyPhase", "GAME " + this.name + " ApplyPhase")
+    }
+
+    if (response.message[0] == "applyPhase") {
+      this.stateParser(response.data)
+    }
+
+    if (response.message[0] == "undo") {
+      this.stateParser(response.data)
     }
   }
 
@@ -66,11 +82,17 @@ export class GameComponent implements OnInit {
     if (!this.recepies) {
       return
     }
-    if (!this.wrapper) {
-      this.wrapper = {
-        game: this.game,
-        recepies: this.recepies,
-      } as unknown as GameWrapper;
+    this.wrapper = {
+      game: this.game,
+      recepies: this.recepies,
+    } as unknown as GameWrapper;
+
+    const lastState = this.getLastState()
+    // revert possible already done moves on phase load
+    // just to avoid wierd states
+    if (!this.isReady && lastState && lastState.move_que.length > 0) {
+      SocketService.sendMessage("undo", "GAME " + this.name + " Undo");
+    } else {
       this.isReady = true;
     }
   }
@@ -127,5 +149,45 @@ export class GameComponent implements OnInit {
   updateWrapper(newWrapper: GameWrapper) {
     this.wrapper = {...newWrapper};
   }
+
+  handleTileClick(tile: Tile) {
+    const lastState = this.getLastState();
+    if (!lastState) {
+      return
+    }  
+    if (lastState.turn_phase == 'Setup') {
+      this.handleTileClickSetupPhase(tile);
+    }
+  }
+  
+  myTurn(): boolean {
+    const lastState = this.getLastState();
+    if (!this.wrapper || !lastState) {
+      return false;
+    } 
+
+    if (lastState.player_turn == 'First') {
+      return this.wrapper.game.player1 == AuthService.getName();
+    } else {
+      return this.wrapper.game.player2 == AuthService.getName();
+    }
+  }
+
+  undo() {
+    SocketService.sendMessage("undo", "GAME " + this.name + " Undo");
+  }
+
+  nextPhase() {
+    SocketService.sendMessage("nextPhase", "GAME " + this.name + " NextPhase");
+  }
+
+  // SETUP PHASE STUFF
+  handleTileClickSetupPhase(tile: Tile) {
+    if (!this.myTurn()) {
+      return
+    }
+    SocketService.sendMessage("baseSetup", "GAME " + this.name + " BaseSetup " + tile.x + " " + tile.y)
+  }
+
 
 }

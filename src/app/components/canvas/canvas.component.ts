@@ -1,7 +1,12 @@
 // canvas.component.ts
-import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ElementRef, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ElementRef, HostListener, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { GameWrapper } from 'src/app/models/game-wrapper.model';
 
+export interface Tile {
+  x: number,
+  y: number,
+  id: string,
+}
 @Component({
   selector: 'app-canvas',
   templateUrl: './canvas.component.html',
@@ -11,6 +16,8 @@ export class CanvasComponent implements OnChanges {
 
   @Input() wrapper: GameWrapper | undefined;
   @ViewChild('gameCanvas') gameCanvas!: ElementRef<HTMLCanvasElement>;
+  
+  @Output() tileClick = new EventEmitter<Tile>();
 
   private context!: CanvasRenderingContext2D | null;
   private canvasWidth: number;
@@ -73,7 +80,12 @@ export class CanvasComponent implements OnChanges {
   }
   
   private handleClickOnTile(row: number, column: number): void {
-    // Add logic here to handle the click based on the row, column coordinates
+    const lastState = this.getLastState();
+    this.tileClick.emit({
+      x: row, 
+      y: column, 
+      id: lastState ? lastState.map[row][column] : ""
+    });
   }
 
   private onMouseMove(event: MouseEvent): void {
@@ -87,6 +99,7 @@ export class CanvasComponent implements OnChanges {
     this.hoveredCol = Math.floor(x / (this.canvasWidth / this.wrapper.game.states[this.wrapper.game.states.length - 1].map[0].length));
     this.hoveredRow = Math.floor(y / (this.canvasHeight / this.wrapper.game.states[this.wrapper.game.states.length - 1].map.length));
 
+    console.log("dd")
     this.renderGameState(); // Re-render to update the hovered tile
   }
 
@@ -129,7 +142,8 @@ export class CanvasComponent implements OnChanges {
   }
 
   private drawGrid(map: string[][]): void {
-    if (!this.context) return;
+    const lastState = this.getLastState()
+    if (!this.context || !lastState) return;
 
     const rows = map.length;
     const columns = rows > 0 ? map[0].length : 0;
@@ -139,6 +153,10 @@ export class CanvasComponent implements OnChanges {
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < columns; col++) {
         this.context.fillStyle = 'lightgrey'; // Change as needed
+        if (lastState.map[row][col] != "") {
+          this.context.fillStyle = "orange"
+        }
+
         this.context.fillRect(col * tileWidth, row * tileHeight, tileWidth, tileHeight);
 
         // Draw borders for each tile
@@ -164,12 +182,23 @@ export class CanvasComponent implements OnChanges {
       for (let col = 0; col < columns; col++) {
 
         // Check if we're displaying footprint and if this tile is within the footprint
-        if (this.wrapper.canvasState.display === 'footprint' && footprint && this.hoveredRow !== null && this.hoveredCol !== null) {
+        if (
+          this.wrapper.canvasState.display === 'footprint' && 
+          footprint && 
+          this.hoveredRow !== null && 
+          this.hoveredCol !== null
+        ) {
           const footprintRow = row - this.hoveredRow;
           const footprintCol = col - this.hoveredCol;
 
           // Check if the current tile is within the footprint bounds
-          if (footprintRow >= 0 && footprintRow < footprint.length && footprintCol >= 0 && footprintCol < footprint[footprintRow].length && footprint[footprintRow][footprintCol]) {
+          if (
+            footprintRow >= 0 && 
+            footprintRow < footprint.length && 
+            footprintCol >= 0 && 
+            footprintCol < footprint[footprintRow].length && 
+            footprint[footprintRow][footprintCol]
+          ) {
             this.context.fillStyle = 'lightyellow'; // Semi-transparent green for footprint
           } else {
             this.context.fillStyle = 'lightgrey';

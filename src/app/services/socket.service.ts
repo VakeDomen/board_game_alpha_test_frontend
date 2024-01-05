@@ -27,6 +27,7 @@ export class SocketService {
 
     this.socket.onmessage = event => {
       if (SocketService.waitingMessage) {
+        console.log("Recieved: " + SocketService.waitingMessage[0]);
         this.messagesSubject.next({
           message: SocketService.waitingMessage,
           data: event.data
@@ -35,6 +36,7 @@ export class SocketService {
           SocketService.waitingMessage = SocketService.messageQue.pop();
           if (SocketService.waitingMessage) {
             const message = SocketService.waitingMessage[1];
+            console.log("Sending: " + SocketService.waitingMessage[0]);
             this.socket?.send(message);
           }
         } else {
@@ -60,6 +62,7 @@ export class SocketService {
 
       if (!SocketService.waitingMessage) {
         SocketService.waitingMessage = SocketService.messageQue.pop();
+        console.log("Sending: ", SocketService.waitingMessage ? SocketService.waitingMessage[0] : "");
         this.socket.send(message);
       }
 
