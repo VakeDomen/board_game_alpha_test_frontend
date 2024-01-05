@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { GameWrapper } from 'src/app/models/game-wrapper.model';
 import { Game, GameState } from 'src/app/models/game.model';
+import { TileRecipes } from 'src/app/models/recepie.model';
 import { MessageResponse, SocketService } from 'src/app/services/socket.service';
 
 @Component({
@@ -11,10 +12,13 @@ import { MessageResponse, SocketService } from 'src/app/services/socket.service'
 })
 export class GameComponent implements OnInit {
 
+
   public isReady = false;
 
   public name: string | undefined;
   public wrapper: GameWrapper | undefined;
+  public game: Game | undefined;
+  public recepies: TileRecipes | undefined;
 
   constructor(
     private route: ActivatedRoute,
@@ -27,6 +31,7 @@ export class GameComponent implements OnInit {
         this.router.navigate(["lobby"]);
       }
       SocketService.sendMessage("state", "GAME " + name + " GetState");
+      SocketService.sendMessage("recepies", "GAME " + name + " GetRecepies");
     });
   }
 
@@ -38,17 +43,38 @@ export class GameComponent implements OnInit {
     if (response.message[0] == "state") {
       this.stateParser(response.data);
     }
+
+    if (response.message[0] == "recepies") {
+      this.recepiesParser(response.data);
+    }
+  }
+
+  recepiesParser(data: string) {
+    this.recepies = JSON.parse(data)["TileRecepeies"] as TileRecipes;
+    console.log(this.recepies, JSON.parse(data));
+    this.createWrapper();
   }
 
   stateParser(data: string) {
+    this.game = JSON.parse(data)["State"] as Game;
+    console.log(this.game);
+    this.createWrapper();
+  }
+
+  createWrapper() {
+    if (!this.game) {
+      return
+    }
+    if (!this.recepies) {
+      return
+    }
     if (!this.wrapper) {
-      console.log((JSON.parse(data)["State"] as Game))
       this.wrapper = {
-        game: (JSON.parse(data)["State"] as Game),
+        game: this.game,
+        recepies: this.recepies,
       } as unknown as GameWrapper;
       this.isReady = true;
-    } else {
-      this.wrapper.game = JSON.parse(data)["State"] as Game;
+      console.log(this.wrapper)
     }
   }
 
