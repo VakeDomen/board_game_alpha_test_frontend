@@ -14,6 +14,11 @@ const routes: Routes =  [
     component: LobbyComponent,
     canActivate: [AuthGuard],
   },
+  {
+    path: '**',
+    component: LobbyComponent,
+    canActivate: [AuthGuard],
+  },
 ];
 
 @NgModule({

@@ -1,20 +1,28 @@
 import { Injectable } from '@angular/core';
+import { SocketService } from './socket.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   
-  private static username: String | undefined;
+  private static username: string | undefined;
 
-  constructor() { }
+  constructor(
+    private router: Router
+  ) {
+   
+  }
 
   static isLoggedIn() {
     return !!AuthService.username;
   }
 
-  static logIn(name: String) {
+  static logIn(name: string) {
+    SocketService.sendMessage("CONTROL AUTH " + name);
     AuthService.username = name;
   }
+
 
 }
