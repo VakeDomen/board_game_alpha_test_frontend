@@ -9,6 +9,6 @@ export interface GameWrapper {
 
 export interface DisplayState {
     display: null | 'footprint' | 'range';
-    tile_selector: string | null,
-    tile_id: string | null,
+    tileSelector: string | null,
+    tileId: string | null,
 }

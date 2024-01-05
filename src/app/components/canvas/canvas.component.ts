@@ -37,9 +37,7 @@ export class CanvasComponent implements OnChanges {
 
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['wrapper']) {
-      this.renderGameState();
-    }
+    console.log("CANVAS CHANGES")
   }
 
   ngAfterViewInit(): void {
@@ -47,7 +45,6 @@ export class CanvasComponent implements OnChanges {
     this.gameCanvas.nativeElement.addEventListener('mousemove', this.onMouseMove.bind(this));
     this.gameCanvas.nativeElement.addEventListener('click', this.onCanvasClick.bind(this));
     this.adjustCanvasSize();
-    this.renderGameState();
     const lastState = this.getLastState();
     if (!lastState) {
       return;
@@ -58,12 +55,13 @@ export class CanvasComponent implements OnChanges {
       width: this.canvasWidth / columns,
       height: this.canvasHeight / rows
     };
+
+    setInterval(() => this.renderGameState(), 26);
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
     this.adjustCanvasSize();
-    this.renderGameState();
   }
 
   private onCanvasClick(event: MouseEvent): void {
@@ -98,9 +96,6 @@ export class CanvasComponent implements OnChanges {
 
     this.hoveredCol = Math.floor(x / (this.canvasWidth / this.wrapper.game.states[this.wrapper.game.states.length - 1].map[0].length));
     this.hoveredRow = Math.floor(y / (this.canvasHeight / this.wrapper.game.states[this.wrapper.game.states.length - 1].map.length));
-
-    console.log("dd")
-    this.renderGameState(); // Re-render to update the hovered tile
   }
 
   private adjustCanvasSize(): void {
@@ -129,6 +124,7 @@ export class CanvasComponent implements OnChanges {
 
 
   private renderGameState(): void {
+
     if (!this.wrapper || !this.context || !this.wrapper.game.states.length) {
       return;
     }
@@ -149,10 +145,10 @@ export class CanvasComponent implements OnChanges {
     const columns = rows > 0 ? map[0].length : 0;
     const tileWidth = this.canvasWidth / columns;
     const tileHeight = this.canvasHeight / rows;
-
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < columns; col++) {
         this.context.fillStyle = 'lightgrey'; // Change as needed
+        
         if (lastState.map[row][col] != "") {
           this.context.fillStyle = "orange"
         }
@@ -169,12 +165,20 @@ export class CanvasComponent implements OnChanges {
     this.drawFoorptint(map);
   }
   private drawFoorptint(map: string[][]) {
-    if (!this.wrapper || !this.wrapper.canvasState || !this.wrapper.canvasState.tile_selector || !this.context) {
+
+    if (
+      !this.wrapper || 
+      !this.wrapper.canvasState || 
+      !this.wrapper.canvasState.tileSelector || 
+      !this.context
+    ) {
       return;
     }
+
+
     const rows = map.length;
     const columns = rows > 0 ? map[0].length : 0;
-    const footprint = this.wrapper.recepies[this.wrapper.canvasState.tile_selector]?.footprint;
+    const footprint = this.wrapper.recepies[this.wrapper.canvasState.tileSelector]?.footprint;
     const tileWidth = this.canvasWidth / columns;
     const tileHeight = this.canvasHeight / rows;
 
@@ -200,18 +204,14 @@ export class CanvasComponent implements OnChanges {
             footprint[footprintRow][footprintCol]
           ) {
             this.context.fillStyle = 'lightyellow'; // Semi-transparent green for footprint
-          } else {
-            this.context.fillStyle = 'lightgrey';
-          }
+            this.context.fillRect(col * tileWidth, row * tileHeight, tileWidth, tileHeight);
+            // Draw borders for each tile
+            this.context.strokeStyle = 'white';
+            this.context.strokeRect(col * tileWidth, row * tileHeight, tileWidth, tileHeight);
+          } 
 
-          this.context.fillRect(col * tileWidth, row * tileHeight, tileWidth, tileHeight);
-
-          // Draw borders for each tile
-          this.context.strokeStyle = 'white';
-          this.context.strokeRect(col * tileWidth, row * tileHeight, tileWidth, tileHeight);
-        } else {
-          this.context.fillStyle = 'lightgrey';
-        }
+          
+        } 
 
       }
     }

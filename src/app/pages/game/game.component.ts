@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Tile } from 'src/app/components/canvas/canvas.component';
-import { GameWrapper } from 'src/app/models/game-wrapper.model';
+import { DisplayState, GameWrapper } from 'src/app/models/game-wrapper.model';
 import { Game, GameState } from 'src/app/models/game.model';
 import { TileRecipes } from 'src/app/models/recepie.model';
 import { AuthService } from 'src/app/services/auth.service';
@@ -51,6 +51,15 @@ export class GameComponent implements OnInit {
       this.stateParser(response.data);
     }
 
+    if (response.message[0] == "nextPhase") {
+      this.stateParser(response.data);
+    }
+
+    if (response.message[0] == "applyPhase") {
+      console.log("APPL")
+      this.stateParser(response.data)
+    }
+
     if (response.message[0] == "recepies") {
       this.recepiesParser(response.data);
     }
@@ -59,16 +68,8 @@ export class GameComponent implements OnInit {
       SocketService.sendMessage("applyPhase", "GAME " + this.name + " ApplyPhase")
     }
 
-    if (response.message[0] == "applyPhase") {
-      this.stateParser(response.data)
-    }
-
     if (response.message[0] == "undo") {
-      this.stateParser(response.data)
-    }
-
-    if (response.message[0] == "nextPhase") {
-      this.stateParser(response.data);
+      SocketService.sendMessage("applyPhase", "GAME " + this.name + " ApplyPhase")
     }
   }
 
@@ -78,27 +79,35 @@ export class GameComponent implements OnInit {
   }
 
   stateParser(data: string) {
+    console.log(data)
     this.game = JSON.parse(data)["State"] as Game;
     this.createWrapper();
   }
 
   createWrapper() {
     if (!this.game) {
+      console.log("no gam")
       return
     }
     if (!this.recepies) {
+      console.log("no rec")
       return
     }
-    this.wrapper = {
-      game: this.game,
-      recepies: this.recepies,
-    } as unknown as GameWrapper;
+    if (!this.wrapper) {
+      this.wrapper = this.defaultWrapper()
+    } else {
+      console.log("APPL2")
+      this.wrapper = {
+        game: this.game, // grab new game state ; else is same
+        recepies: this.wrapper.recepies,
+        canvasState: this.wrapper.canvasState,
+      } as GameWrapper
+    }
 
     const lastState = this.getLastState()
     this.labelPlayerTurn = this.getPlayerTurnLabel();
     this.phase = lastState?.turn_phase ?? "";
     this.playerTurn = lastState?.player_turn ?? "";
-    
     
     // revert possible already done moves on phase load
     // just to avoid wierd states
@@ -107,8 +116,18 @@ export class GameComponent implements OnInit {
     } else {
       this.isReady = true;
     }
+  }
 
-    this.labelPlayerTurn = this.getPlayerTurnLabel();
+  defaultWrapper() {
+    return {
+      game: this.game,
+      recepies: this.recepies,
+      canvasState: {
+        display: null,
+        tileSelector: null,
+        tileId: null,
+      } as DisplayState
+    } as GameWrapper;
   }
 
   getGameName(): string {
@@ -161,6 +180,7 @@ export class GameComponent implements OnInit {
   }
 
   updateWrapper(newWrapper: GameWrapper) {
+    console.log("wrapper state change");
     this.wrapper = {...newWrapper};
   }
 

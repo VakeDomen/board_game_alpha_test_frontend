@@ -16,8 +16,8 @@ export class PhaseSetupComponent implements OnInit {
   ngOnInit(): void {
     const state: DisplayState = {
       display: 'footprint',
-      tile_selector: this.getLastState()?.player_turn == 'First' ? 'TechBase' : 'BugBase1',
-      tile_id: null
+      tileSelector: this.getLastState()?.player_turn == 'First' ? 'TechBase' : 'BugBase1',
+      tileId: null
     };
     if (!this.wrapper) {
       return
