@@ -93,6 +93,12 @@ export class GameComponent implements OnInit {
       console.log("no rec")
       return
     }
+
+    if (AuthService.getName() == this.game.player1) {
+      this.game.states[this.game.states.length - 1].map.reverse();
+    }
+
+
     if (!this.wrapper) {
       this.wrapper = this.defaultWrapper()
     } else {
@@ -217,8 +223,12 @@ export class GameComponent implements OnInit {
 
   // SETUP PHASE STUFF
   handleTileClickSetupPhase(tile: Tile) {
-    if (!this.myTurn()) {
+    const lastState = this.getLastState();
+    if (!this.myTurn() || !this.wrapper || !lastState) {
       return
+    }
+    if (AuthService.getName() == this.wrapper.game.player1) {
+      tile.x = lastState.map.length - 1 - tile.x;
     }
     SocketService.sendMessage("baseSetup", "GAME " + this.name + " BaseSetup " + tile.x + " " + tile.y)
   }
