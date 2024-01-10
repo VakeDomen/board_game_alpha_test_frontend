@@ -8,7 +8,9 @@ export interface GameWrapper {
 }
 
 export interface DisplayState {
-    display: null | 'footprint' | 'range';
+    display: DisplayTag[];
     tileSelector: string | null,
     tileId: string | null,
 }
+
+type DisplayTag = 'footprint' | 'range' | 'setup';

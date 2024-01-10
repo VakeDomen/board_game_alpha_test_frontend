@@ -129,7 +129,7 @@ export class GameComponent implements OnInit {
       game: this.game,
       recepies: this.recepies,
       canvasState: {
-        display: null,
+        display: [],
         tileSelector: null,
         tileId: null,
       } as DisplayState
