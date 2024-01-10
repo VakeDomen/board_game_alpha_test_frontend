@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { DisplayState, GameWrapper } from 'src/app/models/game-wrapper.model';
+import { GameService } from 'src/app/services/game.service';
 
 @Component({
   selector: 'app-phase-setup',
@@ -16,7 +17,7 @@ export class PhaseSetupComponent implements OnInit {
   ngOnInit(): void {
     const state: DisplayState = {
       display: ['footprint', 'setup'],
-      tileSelector: this.getLastState()?.player_turn == 'First' ? 'TechBase' : 'BugBase1',
+      tileSelector: GameService.tryToGetLastState(this.wrapper)?.player_turn == 'First' ? 'TechBase' : 'BugBase1',
       tileId: null
     };
     if (!this.wrapper) {
@@ -27,7 +28,4 @@ export class PhaseSetupComponent implements OnInit {
   }
 
 
-  getLastState() {
-    return this.wrapper?.game.states[this.wrapper.game.states.length - 1]
-  }
 }

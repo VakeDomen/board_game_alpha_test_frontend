@@ -1,6 +1,7 @@
 // canvas.component.ts
 import { Component, Input, OnChanges, SimpleChanges, ViewChild, ElementRef, HostListener, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { GameWrapper } from 'src/app/models/game-wrapper.model';
+import { GameService } from 'src/app/services/game.service';
 
 export interface Tile {
   x: number,
@@ -40,7 +41,7 @@ export class CanvasComponent implements OnChanges {
     this.gameCanvas.nativeElement.addEventListener('mousemove', this.onMouseMove.bind(this));
     this.gameCanvas.nativeElement.addEventListener('click', this.onCanvasClick.bind(this));
     this.adjustCanvasSize();
-    const lastState = this.getLastState();
+    const lastState = GameService.tryToGetLastState(this.wrapper);
     if (!lastState) {
       return;
     }
@@ -66,7 +67,7 @@ export class CanvasComponent implements OnChanges {
   }
 
   private handleClickOnTile(row: number, column: number): void {
-    const lastState = this.getLastState();
+    const lastState = GameService.tryToGetLastState(this.wrapper);
     this.tileClick.emit({
       x: row,
       y: column,
@@ -137,7 +138,7 @@ export class CanvasComponent implements OnChanges {
   }
 
   private drawGrid(map: string[][]): void {
-    const lastState = this.getLastState()
+    const lastState = GameService.tryToGetLastState(this.wrapper);
     if (!this.context || !this.wrapper || !lastState) return;
 
     for (let row = 0; row < map.length; row++) {
@@ -168,7 +169,7 @@ export class CanvasComponent implements OnChanges {
     
   }
   private drawSetupSpaces(map: string[][]) {
-    const lastState = this.getLastState()
+    const lastState = GameService.tryToGetLastState(this.wrapper);
     if (!this.context || !this.wrapper || !lastState) return;
 
     const rows = map.length;
@@ -192,7 +193,7 @@ export class CanvasComponent implements OnChanges {
     }
   }
   private drawFoorptint(map: string[][]) {
-    const lastState = this.getLastState();
+    const lastState = GameService.tryToGetLastState(this.wrapper);
     if (
       !lastState ||
       !this.wrapper ||
@@ -248,10 +249,4 @@ export class CanvasComponent implements OnChanges {
     }
   }
 
-  getLastState() {
-    if (!this.wrapper) {
-      return null;
-    }
-    return this.wrapper.game.states[this.wrapper.game.states.length - 1];
-  }
 }

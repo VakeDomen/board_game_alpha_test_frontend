@@ -5,6 +5,7 @@ import { DisplayState, GameWrapper } from 'src/app/models/game-wrapper.model';
 import { Game, GameState } from 'src/app/models/game.model';
 import { TileRecipes } from 'src/app/models/recepie.model';
 import { AuthService } from 'src/app/services/auth.service';
+import { GameService } from 'src/app/services/game.service';
 import { MessageResponse, SocketService } from 'src/app/services/socket.service';
 
 @Component({
@@ -95,25 +96,17 @@ export class GameComponent implements OnInit {
     }
 
     if (AuthService.getName() == this.game.player1) {
-      this.game.states[this.game.states.length - 1].map.reverse();
+      GameService.reverseGameMapRows(this.game);
     }
-
-
     if (!this.wrapper) {
-      this.wrapper = this.defaultWrapper()
-    } else {
-      console.log("APPL2")
-      this.wrapper = {
-        game: this.game, // grab new game state ; else is same
-        recepies: this.wrapper.recepies,
-        canvasState: this.wrapper.canvasState,
-      } as GameWrapper
-    }
+      this.wrapper = GameService.createDefaultWrapper(this.game, this.recepies)
+    } 
 
-    const lastState = this.getLastState()
+    this.wrapper = GameService.updateWrapperGame(this.wrapper, this.game);
+    const lastState = GameService.getLastState(this.wrapper);
     this.labelPlayerTurn = this.getPlayerTurnLabel();
-    this.phase = lastState?.turn_phase ?? "";
-    this.playerTurn = lastState?.player_turn ?? "";
+    this.phase = lastState.turn_phase;
+    this.playerTurn = lastState.player_turn;
     
     // revert possible already done moves on phase load
     // just to avoid wierd states
@@ -124,17 +117,6 @@ export class GameComponent implements OnInit {
     }
   }
 
-  defaultWrapper() {
-    return {
-      game: this.game,
-      recepies: this.recepies,
-      canvasState: {
-        display: [],
-        tileSelector: null,
-        tileId: null,
-      } as DisplayState
-    } as GameWrapper;
-  }
 
   getGameName(): string {
     if (!this.wrapper) {
@@ -144,54 +126,31 @@ export class GameComponent implements OnInit {
   }
 
   getPlayerName(pl: string) {
-    if (!this.wrapper) {
-      return "Unknown";
-    }
-
-    if (pl == "First") {
-      return this.wrapper.game.player1;
-    }
-    if (pl == "Second") {
-      return this.wrapper.game.player2;
-    }
-    console.log("Unknown player selector: ", pl);
-    return "Unknown";
+    
   }
 
   getPhase() {
     if (!this.wrapper) {
       return "End";
     }
-    return this.wrapper.game.states[this.wrapper.game.states.length - 1].turn_phase;
+    return GameService.getPhase(this.wrapper);
   }
 
-  getPlayerTurnLabel() {
-    const state = this.getLastState();
-    if (!state) {
-      return "Unknown player turn";
+  getPlayerTurnLabel(): string {
+    if (!this.wrapper) {
+      return "Unknown";
     }
-
-    if (state.player_turn == 'First') {
-      return "Tech - " + this.getPlayerName(state.player_turn)
-    }
-
-    if (state.player_turn == 'Second') {
-      return "Bug - " + this.getPlayerName(state.player_turn)
-    }
-    return "Unknown"
-  }
-
-  getLastState(): GameState | undefined {
-    return this.wrapper?.game.states[this.wrapper.game.states.length - 1]
+    return GameService.getCurrentPlayerTurnSide(this.wrapper) + 
+      " - " + 
+      GameService.getCurrentPlayerTurnName(this.wrapper);
   }
 
   updateWrapper(newWrapper: GameWrapper) {
-    console.log("wrapper state change");
     this.wrapper = {...newWrapper};
   }
 
   handleTileClick(tile: Tile) {
-    const lastState = this.getLastState();
+    const lastState = GameService.tryToGetLastState(this.wrapper);;
     if (!lastState) {
       return
     }  
@@ -200,19 +159,6 @@ export class GameComponent implements OnInit {
     }
   }
   
-  myTurn(): boolean {
-    const lastState = this.getLastState();
-    if (!this.wrapper || !lastState) {
-      return false;
-    } 
-
-    if (lastState.player_turn == 'First') {
-      return this.wrapper.game.player1 == AuthService.getName();
-    } else {
-      return this.wrapper.game.player2 == AuthService.getName();
-    }
-  }
-
   undo() {
     SocketService.sendMessage("undo", "GAME " + this.name + " Undo");
   }
@@ -223,8 +169,8 @@ export class GameComponent implements OnInit {
 
   // SETUP PHASE STUFF
   handleTileClickSetupPhase(tile: Tile) {
-    const lastState = this.getLastState();
-    if (!this.myTurn() || !this.wrapper || !lastState) {
+    const lastState = GameService.tryToGetLastState(this.wrapper);;
+    if (!this.wrapper || !GameService.isMyTurn(this.wrapper) ||  !lastState) {
       return
     }
     if (AuthService.getName() == this.wrapper.game.player1) {
