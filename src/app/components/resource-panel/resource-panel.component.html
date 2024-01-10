@@ -1,0 +1,34 @@
+<!-- resource-panel.component.html -->
+<div class="box mb-3">
+    <div class="columns">
+        <!-- Tech Resources Column -->
+        <div class="column">
+            <h3 class="title is-4">Tech Resources</h3>
+            <div>
+                <img class="resource-image" src="assets/tech/stone-pile(1).png" alt="Gold">
+                <p>Stone: {{ techPrimary }}</p>
+            </div>
+            <div>
+                <img class="resource-image" src="assets/tech/metal-bar(1).png" alt="Metal">
+                <p>Metal: {{ techSecondary }}</p>
+            </div>
+        </div>
+
+        <!-- Bug Resources Column -->
+        <div class="column">
+            <h3 class="title is-4">Bug Resources</h3>
+            <div>
+                <img class="resource-image" src="assets/bug/egg-eye.png" alt="Egg">
+                <p>Eggs: {{ bugPrimary }}</p>
+            </div>
+            <div>
+                <img class="resource-image" src="assets/bug/fish-corpse.png" alt="Corpse">
+                <p>Corpses: {{ bugSecondary }}</p>
+            </div>
+            <div>
+                <img class="resource-image" src="assets/bug/alien-bug.png" alt="Giant Egg">
+                <p>Giant Eggs: {{ bugUnique }}</p>
+            </div>
+        </div>
+    </div>
+</div>

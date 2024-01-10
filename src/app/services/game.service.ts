@@ -58,6 +58,10 @@ export class GameService {
     return wrapper.game.states[wrapper.game.states.length - 1].turn_phase;
   }
 
+  static getPlayerTurn(wrapper: GameWrapper): string {
+    return wrapper.game.states[wrapper.game.states.length - 1].player_turn;
+  }
+
   static reverseGameMapRows(game: Game) {
     game.states[game.states.length - 1].map.reverse();
   }

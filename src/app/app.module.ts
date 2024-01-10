@@ -16,6 +16,7 @@ import { PhaseEndComponent } from './components/phase-end/phase-end.component';
 import { PhaseMainComponent } from './components/phase-main/phase-main.component';
 import { PhaseTriggersComponent } from './components/phase-triggers/phase-triggers.component';
 import { PhaseDmgComponent } from './components/phase-dmg/phase-dmg.component';
+import { ResourcePanelComponent } from './components/resource-panel/resource-panel.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { PhaseDmgComponent } from './components/phase-dmg/phase-dmg.component';
     PhaseEndComponent,
     PhaseMainComponent,
     PhaseTriggersComponent,
-    PhaseDmgComponent
+    PhaseDmgComponent,
+    ResourcePanelComponent
   ],
   imports: [
     BrowserModule,

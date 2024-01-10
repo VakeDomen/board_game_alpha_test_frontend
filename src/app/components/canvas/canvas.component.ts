@@ -1,5 +1,5 @@
 // canvas.component.ts
-import { Component, Input, OnChanges, SimpleChanges, ViewChild, ElementRef, HostListener, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild, ElementRef, HostListener, ChangeDetectorRef, Output, EventEmitter, NgZone } from '@angular/core';
 import { GameWrapper } from 'src/app/models/game-wrapper.model';
 import { GameService } from 'src/app/services/game.service';
 
@@ -26,15 +26,14 @@ export class CanvasComponent implements OnChanges {
 
   private hoveredRow: number | null = null;
   private hoveredCol: number | null = null;
+  private rendering: boolean = true;
 
   constructor(
     private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
   ) { }
 
-
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log("CANVAS CHANGES ")
-  }
+  ngOnChanges(changes: SimpleChanges): void { }
 
   ngAfterViewInit(): void {
     this.context = this.gameCanvas.nativeElement.getContext('2d');
@@ -51,9 +50,21 @@ export class CanvasComponent implements OnChanges {
       width: this.gameCanvas.nativeElement.width / columns,
       height: this.gameCanvas.nativeElement.height / rows
     };
-
-    setInterval(() => this.renderGameState(), 26);
+    this.drawLoop();
   }
+
+  ngOnDestroy(): void {
+    this.rendering = false;
+  }
+
+  private drawLoop(): void {
+    if (this.rendering) {
+      this.renderGameState();
+      requestAnimationFrame(() => this.drawLoop());
+    }
+  }
+
+
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
@@ -124,7 +135,6 @@ export class CanvasComponent implements OnChanges {
 
 
   private renderGameState(): void {
-
     if (!this.wrapper || !this.context || !this.wrapper.game.states.length) {
       return;
     }
@@ -177,18 +187,12 @@ export class CanvasComponent implements OnChanges {
     
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < columns; col++) {
-        this.context.fillStyle = 'lightgrey'; // Change as needed
-
-        if (row < rows / 2) {
+        if (map[row][col] == "" && row < rows / 2) {
           this.context.fillStyle = "#ffcccc"
+          this.context.fillRect(col * this.tileSize.width, row * this.tileSize.height, this.tileSize.width, this.tileSize.height);
+          this.context.strokeStyle = 'white';
+          this.context.strokeRect(col * this.tileSize.width, row * this.tileSize.height, this.tileSize.width, this.tileSize.height);
         }
-
-        this.context.fillRect(col * this.tileSize.width, row * this.tileSize.height, this.tileSize.width, this.tileSize.height);
-
-        // Draw borders for each tile
-        this.context.strokeStyle = 'white';
-        this.context.strokeRect(col * this.tileSize.width, row * this.tileSize.height, this.tileSize.width, this.tileSize.height);
-
       }
     }
   }
@@ -244,7 +248,6 @@ export class CanvasComponent implements OnChanges {
             this.context.strokeRect(col * this.tileSize.width, row * this.tileSize.height, this.tileSize.width, this.tileSize.height);
           }
         }
-
       }
     }
   }

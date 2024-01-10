@@ -20,6 +20,7 @@ export class GameComponent implements OnInit {
   public labelPlayerTurn: string = "";
   public phase: string = "";
   public playerTurn: string = "";
+  public myTurn: boolean = true;
 
   public name: string | undefined;
   public wrapper: GameWrapper | undefined;
@@ -57,7 +58,6 @@ export class GameComponent implements OnInit {
     }
 
     if (response.message[0] == "applyPhase") {
-      console.log("APPL")
       this.stateParser(response.data)
     }
 
@@ -80,18 +80,15 @@ export class GameComponent implements OnInit {
   }
 
   stateParser(data: string) {
-    console.log(data)
     this.game = JSON.parse(data)["State"] as Game;
     this.createWrapper();
   }
 
   createWrapper() {
     if (!this.game) {
-      console.log("no gam")
       return
     }
     if (!this.recepies) {
-      console.log("no rec")
       return
     }
 
@@ -103,13 +100,14 @@ export class GameComponent implements OnInit {
     } 
 
     this.wrapper = GameService.updateWrapperGame(this.wrapper, this.game);
-    const lastState = GameService.getLastState(this.wrapper);
+    this.phase = GameService.getPhase(this.wrapper);
+    this.playerTurn = GameService.getPlayerTurn(this.wrapper);
     this.labelPlayerTurn = this.getPlayerTurnLabel();
-    this.phase = lastState.turn_phase;
-    this.playerTurn = lastState.player_turn;
+    this.myTurn = GameService.isMyTurn(this.wrapper);
     
     // revert possible already done moves on phase load
     // just to avoid wierd states
+    const lastState = GameService.getLastState(this.wrapper);
     if (!this.isReady && lastState && lastState.move_que.length > 0) {
       SocketService.sendMessage("undo", "GAME " + this.name + " Undo");
     } else {
@@ -117,23 +115,11 @@ export class GameComponent implements OnInit {
     }
   }
 
-
   getGameName(): string {
     if (!this.wrapper) {
       return "Unknown game";
     }
     return this.wrapper.game.name;
-  }
-
-  getPlayerName(pl: string) {
-    
-  }
-
-  getPhase() {
-    if (!this.wrapper) {
-      return "End";
-    }
-    return GameService.getPhase(this.wrapper);
   }
 
   getPlayerTurnLabel(): string {

@@ -35,19 +35,28 @@
             <app-canvas [wrapper]="wrapper" (tileClick)="handleTileClick($event)"></app-canvas>
         </div>
         <div class="column is-half ">
-            <div class="level has-text-centered-mobile">
-                <div class="level-left">
-                    <button class="button is-link is-outlined" (click)="undo()">Undo</button>
+            <app-resource-panel [wrapper]="wrapper"></app-resource-panel>
+            <div *ngIf="myTurn">
+                <div class="level has-text-centered-mobile" >
+                    <div class="level-left">
+                        <button class="button is-link is-outlined" (click)="undo()">Undo</button>
+                    </div>
+                    <div class="level-right">
+                        <button class="button is-link" (click)="nextPhase()">Next Phase</button>
+                    </div>
                 </div>
-                <div class="level-right">
-                    <button class="button is-link" (click)="nextPhase()">Next Phase</button>
-                </div>
+                <app-phase-setup [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Setup'"></app-phase-setup>
+                <app-phase-dmg [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Dmg'"></app-phase-dmg>
+                <app-phase-triggers [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Triggers'"></app-phase-triggers>
+                <app-phase-main [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Main'"></app-phase-main>
+                <app-phase-end [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'End'"></app-phase-end>
             </div>
-            <app-phase-setup [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Setup'"></app-phase-setup>
-            <app-phase-dmg [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Dmg'"></app-phase-dmg>
-            <app-phase-triggers [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Triggers'"></app-phase-triggers>
-            <app-phase-main [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'Main'"></app-phase-main>
-            <app-phase-end [wrapper]="wrapper" (wrapperUpdate)="updateWrapper($event)" class="stretch" *ngIf="phase == 'End'"></app-phase-end>
+            
+           <div *ngIf="!myTurn">
+               <div class="level" >
+                   <div class="box level-item">Opponent's turn (wait)</div>
+               </div>
+           </div>  
         </div>
     </div>
 </div>
