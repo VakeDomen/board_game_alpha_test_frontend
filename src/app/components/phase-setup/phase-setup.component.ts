@@ -20,6 +20,10 @@ export class PhaseSetupComponent implements OnChanges {
     if (!this.wrapper) {
       return
     }
+    if (this.game == JSON.stringify(this.wrapper)) {
+      return;
+    }
+
     const display: DisplayTag[] = [];
     if (GameService.isMyTurn(this.wrapper)) {
       display.push('setup');
@@ -34,6 +38,7 @@ export class PhaseSetupComponent implements OnChanges {
       return
     }
     this.wrapper.canvasState = state;
+    this.game = JSON.stringify(this.wrapper)
     this.wrapperUpdate.emit(this.wrapper);
   }
 

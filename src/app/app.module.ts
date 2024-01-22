@@ -17,6 +17,7 @@ import { PhaseMainComponent } from './components/phase-main/phase-main.component
 import { PhaseTriggersComponent } from './components/phase-triggers/phase-triggers.component';
 import { PhaseDmgComponent } from './components/phase-dmg/phase-dmg.component';
 import { ResourcePanelComponent } from './components/resource-panel/resource-panel.component';
+import { TileCardComponent } from './components/tile-card/tile-card.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { ResourcePanelComponent } from './components/resource-panel/resource-pan
     PhaseMainComponent,
     PhaseTriggersComponent,
     PhaseDmgComponent,
-    ResourcePanelComponent
+    ResourcePanelComponent,
+    TileCardComponent
   ],
   imports: [
     BrowserModule,

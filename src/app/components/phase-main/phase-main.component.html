@@ -1,1 +1,16 @@
-<p>phase-main works!</p>
+<div class="box">
+    <div *ngIf="playerTurn == 'First'"></div>
+    <div *ngIf="playerTurn == 'Second'">
+        <div class="columns">
+            <div class="column">
+                <app-tile-card [wrapper]="wrapper" [key]="'BugSoldierLV1'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'BugSoldierLV2'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'BugSoldierLV3'"></app-tile-card>
+            </div>
+            <div class="column">
+                <app-tile-card [wrapper]="wrapper" [key]="'BugEliteMelee'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'BugEliteRanged'"></app-tile-card>
+            </div>
+        </div>
+    </div>
+</div>

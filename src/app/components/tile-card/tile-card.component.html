@@ -1,0 +1,33 @@
+<div clasS="mt-5 box" [ngStyle]="{
+    'background-image': 'url(' + getBackgroundImageUrl(key) + ')',
+    'color': isBug() ? 'red' : 'blue',
+    'font-wight': 500
+}"
+>
+    <h3 class="title is-4">{{ getName(key) }}</h3>
+    <div>
+        <p>
+            <span *ngFor="let res of getCost(key)">
+                <img *ngIf="res == 'Egg'" class="resource-image" src="assets/bug/egg-eye.png" alt="Egg">
+                <img *ngIf="res == 'Corpse'" class="resource-image" src="assets/bug/alien-bug.png" alt="Giant Egg">
+                <img *ngIf="res == 'GiantEgg'" class="resource-image" src="assets/bug/alien-bug.png" alt="Giant Egg">
+            </span>
+        </p>
+        <br>
+    </div>
+    <div>
+        <div>
+            <img class="resource-image" src="assets/general/health-normal.png" alt="HP">
+            HP: {{ getStats(key).hp }}
+        </div>
+        <div>
+            <img *ngIf="isBug()" class="resource-image" src="assets/general/fangs.png" alt="ATTACK">
+            <img *ngIf="!isBug()" class="resource-image" src="assets/general/heavy-bullets.png" alt="HP">
+            ATTACK: {{ getStats(key).attack }}
+        </div>
+        <div>
+            RANGE: {{ getStats(key).range }}
+            <img class="resource-image" src="assets/general/arrow-dunk.png" alt="RANGE">
+        </div>
+    </div>
+</div>
