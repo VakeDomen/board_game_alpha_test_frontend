@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { GameWrapper } from 'src/app/models/game-wrapper.model';
 import { Stats } from 'src/app/models/recepie.model';
+import { GameService } from 'src/app/services/game.service';
 
 @Component({
   selector: 'app-tile-card',
@@ -75,5 +76,46 @@ export class TileCardComponent implements OnInit {
     if (key == 'BugEliteMelee') return "assets/bug/alien-bug.png";
     if (key == 'BugEliteRanged') return "assets/bug/alien-bug.png";
     return "assets/general/health-normal.png";
+  }
+
+  canPlace(key: string) {
+    if (!this.wrapper) {
+      return false;
+    }
+    if (!GameService.hasResourcesToPlace(this.wrapper, key, this.getPlayerByKey(key))) {
+      return false;
+    }
+    return true
+  }
+
+  getPlayerByKey(key: String) {
+    if (key.includes("Tech")) {
+      return "First";
+    } else {
+      return "Second";
+    }
+  }
+
+  isActive(key: string) {
+    if (!this.wrapper) {
+      return false;
+    }
+    return this.wrapper.canvasState.tileSelector == key;
+  }
+
+  activate(key: string) {
+    if (!this.wrapper) {
+      return;
+    }
+    if (!this.canPlace(key)) {
+      return;
+    }
+    if (this.isActive(key)) {
+      this.wrapper.canvasState.display = this.wrapper.canvasState.display.filter(item => item != "footprint");
+      this.wrapper.canvasState.tileSelector = null;  
+    } else {
+      this.wrapper.canvasState.display.push("footprint");
+      this.wrapper.canvasState.tileSelector = key;
+    }
   }
 }

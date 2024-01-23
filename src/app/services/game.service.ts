@@ -21,6 +21,41 @@ export class GameService {
     }
   }
 
+  static hasResourcesToPlace(wrapper: GameWrapper, key: string, player: string): boolean {
+    const recipe = wrapper.recepies[key];
+    if (!recipe) {
+      return false;
+    }
+
+    const resources = this.getPlayerResources(wrapper, player);
+    const cost = recipe.cost;
+
+    // Count the resources the player has
+    const resourceCounts = resources.reduce((acc, resource) => {
+      acc[resource] = (acc[resource] || 0) + 1;
+      return acc;
+    }, {} as {[key: string]: number});
+
+    // Check if the player has enough of each resource required by the recipe
+    for (const resourceNeeded of cost) {
+        if (!resourceCounts[resourceNeeded] || resourceCounts[resourceNeeded] == 0) {
+            return false; // Not enough of this resource
+        }
+        resourceCounts[resourceNeeded]--;
+    }
+
+    return true; // Player has all the resources needed
+}
+
+
+  static getPlayerResources(wrapper: GameWrapper, player: string) {
+    if (player == 'First') {
+      return this.getLastState(wrapper).tech_resources;
+    } else {
+      return this.getLastState(wrapper).bug_resources;
+    }
+  }
+
   static getCurrentPlayerTurnName(wrapper: GameWrapper): String {
     const state = this.getLastState(wrapper);
     if (state.player_turn == "First") {

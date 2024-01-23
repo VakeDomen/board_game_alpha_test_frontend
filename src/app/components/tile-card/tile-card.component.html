@@ -1,8 +1,17 @@
 <div clasS="mt-5 box" [ngStyle]="{
-    'background-image': 'url(' + getBackgroundImageUrl(key) + ')',
-    'color': isBug() ? 'red' : 'blue',
-    'font-wight': 500
-}"
+        'background-image': 'url(' + getBackgroundImageUrl(key) + ')',
+        'color': isBug() ? 'red' : 'blue',
+        'font-wight': 500
+    }"
+
+    [ngClass]="{
+        'is-disabled': !canPlace(key),
+        'is-enabled-tech': !isActive(key) && canPlace(key) && this.getPlayerByKey(key) == 'First',
+        'is-enabled-bug':  !isActive(key) && canPlace(key) && this.getPlayerByKey(key) == 'Second',
+        'is-active': isActive(key)
+    }"
+
+    (click)="activate(key)"
 >
     <h3 class="title is-4">{{ getName(key) }}</h3>
     <div>

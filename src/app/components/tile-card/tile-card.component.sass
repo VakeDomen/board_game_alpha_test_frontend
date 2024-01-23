@@ -11,18 +11,50 @@
     background-position: center
 
 
-.box::before 
+
+.is-enabled-bug::before 
     content: ''
     position: absolute
     top: 0
     right: 0
     bottom: 0
     left: 0
-    background-color: rgba(255, 255, 255, 0.5) 
+    background-color: rgba(255, 255, 255, 0.4) 
     z-index: 1
+    cursor: pointer 
 
+.is-enabled-tech::before 
+    content: ''
+    position: absolute
+    top: 0
+    right: 0
+    bottom: 0
+    left: 0
+    background-color: rgba(255, 255, 255, 0.4) 
+    z-index: 1
+    cursor: pointer
+
+.is-disabled::before 
+    content: ''
+    position: absolute
+    top: 0
+    right: 0
+    bottom: 0
+    left: 0
+    background-color: rgba(255, 255, 255, 0.8) 
+    z-index: 1
 
 .box > * 
     position: relative
     z-index: 2
 
+
+
+.is-enabled-bug:hover:before
+    background-color: rgba(255, 179, 179, 0.5)
+
+.is-enabled-tech:hover:before
+    background-color: rgba(160, 180, 255, 0.5)
+
+.is-active:before
+    background-color: rgba(160, 180, 255, 0.0)

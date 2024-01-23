@@ -72,6 +72,10 @@ export class GameComponent implements OnInit {
     if (response.message[0] == "undo") {
       SocketService.sendMessage("applyPhase", "GAME " + this.name + " ApplyPhase")
     }
+
+    if (response.message[0] == "tilePlacement") {
+      SocketService.sendMessage("applyPhase", "GAME " + this.name + " ApplyPhase")
+    }
   }
 
   recepiesParser(data: string) {
@@ -142,6 +146,33 @@ export class GameComponent implements OnInit {
     }  
     if (lastState.turn_phase == 'Setup') {
       this.handleTileClickSetupPhase(tile);
+    }
+
+    if (lastState.turn_phase == 'Main') {
+      this.handleTileClickMainPhase(tile);
+    }
+  }
+  handleTileClickMainPhase(tile: Tile) {
+    const lastState = GameService.tryToGetLastState(this.wrapper);;
+    if (!this.wrapper || !GameService.isMyTurn(this.wrapper) ||  !lastState) {
+      return
+    }
+    if (AuthService.getName() == this.wrapper.game.player1) {
+      tile.x = lastState.map.length - 1 - tile.x;
+    }
+
+    // placed a tile
+    if (this.wrapper.canvasState.display.includes("footprint")) {
+      const tileSelector = this.wrapper.canvasState.tileSelector;
+      SocketService.sendMessage("tilePlacement", "GAME " + 
+        this.name + 
+        " PlaceTile " + 
+        tileSelector + 
+        " " +
+        tile.x + 
+        " " + 
+        tile.y +
+        " 0")
     }
   }
   

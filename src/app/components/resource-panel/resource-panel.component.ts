@@ -23,12 +23,12 @@ export class ResourcePanelComponent implements OnChanges {
     if (!this.wrapper) {
       return;
     }
-
+    console.log("RESSS", GameService.getLastState(this.wrapper))
     this.bugPrimary = GameService.getLastState(this.wrapper).bug_resources.filter(r => r == 'Egg').length;
     this.bugSecondary = GameService.getLastState(this.wrapper).bug_resources.filter(r => r == 'Corpse').length;
     this.bugUnique = GameService.getLastState(this.wrapper).bug_resources.filter(r => r == 'GiantEgg').length;
-    this.techPrimary = GameService.getLastState(this.wrapper).bug_resources.filter(r => r == 'Gold').length;
-    this.techSecondary = GameService.getLastState(this.wrapper).bug_resources.filter(r => r == 'Metal').length;
+    this.techPrimary = GameService.getLastState(this.wrapper).tech_resources.filter(r => r == 'Gold').length;
+    this.techSecondary = GameService.getLastState(this.wrapper).tech_resources.filter(r => r == 'Metal').length;
   }
 
 }
