@@ -22,6 +22,7 @@ export class CanvasComponent implements OnChanges {
 
   private context!: CanvasRenderingContext2D | null;
   private tileSize!: { width: number; height: number; };
+  private preloadedImages: {[key: string]: HTMLImageElement} = {};
 
 
   private hoveredRow: number | null = null;
@@ -50,14 +51,19 @@ export class CanvasComponent implements OnChanges {
       width: this.gameCanvas.nativeElement.width / columns,
       height: this.gameCanvas.nativeElement.height / rows
     };
-    this.drawLoop();
+    this.initDrawLoop();
   }
 
   ngOnDestroy(): void {
     this.rendering = false;
   }
 
-  private drawLoop(): void {
+  private async initDrawLoop() {
+    this.preloadedImages = await this.preloadImages();
+    this.drawLoop();
+  }
+
+  private async drawLoop(): Promise<void> {
     if (this.rendering) {
       this.renderGameState();
       requestAnimationFrame(() => this.drawLoop());
@@ -147,37 +153,125 @@ export class CanvasComponent implements OnChanges {
     this.drawGrid(lastState.map);
   }
 
-  private drawGrid(map: string[][]): void {
+  private async preloadImages(): Promise<any> {
+    if (!this.wrapper) {
+      return;
+    }
+    const imageLoadPromises: Promise<HTMLImageElement>[] = [];
+    const loadedImages: {[key: string]: HTMLImageElement} = {};
+    for (const key in this.wrapper.recepies) {
+      const imageUrl = this.getBackgroundImageUrl(key);
+      const image = new Image();
+      image.src = imageUrl;
+      loadedImages[key] = image;
+      imageLoadPromises.push(new Promise((resolve, reject) => {
+          image.onload = () => resolve(image);
+          image.onerror = reject;
+      }));
+    }
+    await Promise.all(imageLoadPromises);
+    return loadedImages;
+  }
+  private async drawGrid(map: string[][]): Promise<void> {
     const lastState = GameService.tryToGetLastState(this.wrapper);
     if (!this.context || !this.wrapper || !lastState) return;
 
+    const coveredTiles = new Set<string>();
+
     for (let row = 0; row < map.length; row++) {
-      for (let col = 0; col < map[0].length; col++) {
-        this.context.fillStyle = 'lightgrey'; // Change as needed
+        for (let col = 0; col < map[0].length; col++) {
+            const tileKey = `${row},${col}`;
+            if (coveredTiles.has(tileKey)) {
+                continue;
+            }
 
-        if (lastState.map[row][col] != "") {
-          this.context.fillStyle = "orange"
+            const tileId = lastState.map[row][col];
+            if (tileId != "") {
+                const tileType = this.getTileTypeById(tileId);
+                const image = this.preloadedImages[tileType];
+                const footprint = this.wrapper.recepies[tileType]?.footprint;
+
+                if (!footprint || !image) {
+                    continue;
+                }
+
+                if (tileType === "BugBase2") {
+                    // Special rendering for BugBase2
+                    const centerRow = row + 1;
+                    const centerCol = col;
+
+                    if (this.context) {
+                        this.context.fillStyle = 'black';
+                        for (let fRow = 0; fRow <= 2; fRow++) {
+                            for (let fCol = -1; fCol <= 1; fCol++) {
+                                const fTileKey = `${row + fRow},${col + fCol}`;
+                                
+
+                                if (row + fRow == centerRow && col + fCol == centerCol) {
+                                    this.context.drawImage(
+                                        image, 
+                                        centerCol * this.tileSize.width, 
+                                        centerRow * this.tileSize.height, 
+                                        this.tileSize.width, 
+                                        this.tileSize.height
+                                    );
+                                    coveredTiles.add(fTileKey);
+                                } else if(row + fRow == centerRow || col + fCol == centerCol) {
+                                    this.context.fillRect(
+                                        (col + fCol) * this.tileSize.width, 
+                                        (row + fRow) * this.tileSize.height, 
+                                        this.tileSize.width, 
+                                        this.tileSize.height
+                                    );
+                                    coveredTiles.add(fTileKey);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Default rendering for other tiles
+                    const footprintWidth = footprint[0].length * this.tileSize.width;
+                    const footprintHeight = footprint.length * this.tileSize.height;
+                    const startX = col * this.tileSize.width;
+                    const startY = row * this.tileSize.height;
+
+                    if (this.context) {
+                        this.context.drawImage(image, startX, startY, footprintWidth, footprintHeight);
+                    }
+
+                    // Mark all tiles in the footprint as covered
+                    for (let fRow = 0; fRow < footprint.length; fRow++) {
+                        for (let fCol = 0; fCol < footprint[0].length; fCol++) {
+                          if (footprint[fRow][fCol]) {
+                            coveredTiles.add(`${row + fRow},${col + fCol}`);
+                          }
+                        }
+                    }
+                }
+            } else {
+                this.context.fillStyle = 'lightgrey';
+                this.context.fillRect(col * this.tileSize.width, row * this.tileSize.height, this.tileSize.width, this.tileSize.height);
+            }
+
+            if (!coveredTiles.has(tileKey)) {
+              this.context.strokeStyle = 'white';
+              this.context.strokeRect(col * this.tileSize.width, row * this.tileSize.height, this.tileSize.width, this.tileSize.height);
+            }
         }
-
-        this.context.fillRect(col * this.tileSize.width, row * this.tileSize.height, this.tileSize.width, this.tileSize.height);
-
-        // Draw borders for each tile
-        this.context.strokeStyle = 'white';
-        this.context.strokeRect(col * this.tileSize.width, row * this.tileSize.height, this.tileSize.width, this.tileSize.height);
-
-      }
     }
 
-
     if (this.wrapper.canvasState.display.includes('setup')) {
-      this.drawSetupSpaces(map);
+        this.drawSetupSpaces(map);
     }
 
     if (this.wrapper.canvasState.display.includes('footprint')) {
-      this.drawFoorptint(map);
-    } 
-    
-  }
+        this.drawFootprint(map);
+    }
+}
+
+
+
+
   private drawSetupSpaces(map: string[][]) {
     const lastState = GameService.tryToGetLastState(this.wrapper);
     if (!this.context || !this.wrapper || !lastState) return;
@@ -196,7 +290,8 @@ export class CanvasComponent implements OnChanges {
       }
     }
   }
-  private drawFoorptint(map: string[][]) {
+
+  private drawFootprint(map: string[][]) {
     const lastState = GameService.tryToGetLastState(this.wrapper);
     if (
       !lastState ||
@@ -250,6 +345,46 @@ export class CanvasComponent implements OnChanges {
         }
       }
     }
+  }
+
+  getImageUrl(tileId: string) {
+    if (!this.wrapper) {
+      return "";
+    }
+    return this.getBackgroundImageUrl(this.getTileTypeById(tileId));
+  }
+
+  getTileTypeById(tileId: string) {
+    if (!this.wrapper) {
+      return "";
+    }
+    const state = GameService.getLastState(this.wrapper);
+    return state.tiles[tileId].tile_type; 
+  }
+
+  getBackgroundImageUrl(key: string) {
+    if (key == 'TechRefinery1') return "assets/tech/furnace.png";
+    if (key == 'TechRefinery2') return "assets/tech/furnace-1.png";
+    if (key == 'TechRoad') return "assets/tech/road.png";
+    if (key == 'TechArtillery1') return "assets/tech/anti-aircraft-gun.png";
+    if (key == 'TechArtillery2') return "assets/tech/anti-aircraft-gun.png";
+    if (key == 'TechTurret1') return "assets/tech/turret.png";
+    if (key == 'TechTurret2') return "assets/tech/turret-1.png";
+    if (key == 'TechMine1') return "assets/tech/mine-wagon.png";
+    if (key == 'TechMine2') return "assets/tech/mine-wagon-1.png";
+    if (key == 'TechNuke') return "assets/tech/nuclear-bomb.png";
+    if (key == 'TechWall1') return "assets/tech/brick-wall.png";
+    if (key == 'TechMarket') return "assets/tech/trade.png";
+    if (key == 'TechBase') return "assets/general/health-normal.png";
+    if (key == 'BugBase1') return "assets/bug/nest-eggs.png";
+    if (key == 'BugBase2') return "assets/bug/nest-eggs1.png";
+    if (key == 'BugBase3') return "assets/bug/nest-eggs2.png";
+    if (key == 'BugSoldierLV1') return "assets/bug/maggot.png";
+    if (key == 'BugSoldierLV2') return "assets/bug/maggot-1.png";
+    if (key == 'BugSoldierLV3') return "assets/bug/maggot-2.png";
+    if (key == 'BugEliteMelee') return "assets/bug/alien-bug.png";
+    if (key == 'BugEliteRanged') return "assets/bug/alien-bug.png";
+    return "assets/general/health-normal.png";
   }
 
 }

@@ -66,10 +66,10 @@ export class TileCardComponent implements OnInit {
     if (key == 'TechNuke') return "assets/tech/nuclear-bomb.png";
     if (key == 'TechWall1') return "assets/tech/brick-wall.png";
     if (key == 'TechMarket') return "assets/tech/trade.png";
-    if (key == 'TechBase') return "assets/tech/health-normal.png";
-    if (key == 'BugBase1') return "assets/tech/nest-eggs.png";
-    if (key == 'BugBase2') return "assets/tech/nest-eggs-1.png";
-    if (key == 'BugBase3') return "assets/tech/nes-eggs-2.png";
+    if (key == 'TechBase') return "assets/general/health-normal.png";
+    if (key == 'BugBase1') return "assets/bug/nest-eggs.png";
+    if (key == 'BugBase2') return "assets/bug/nest-eggs1.png";
+    if (key == 'BugBase3') return "assets/bug/nest-eggs2.png";
     if (key == 'BugSoldierLV1') return "assets/bug/maggot.png";
     if (key == 'BugSoldierLV2') return "assets/bug/maggot-1.png";
     if (key == 'BugSoldierLV3') return "assets/bug/maggot-2.png";
