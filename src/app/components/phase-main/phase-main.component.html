@@ -1,5 +1,29 @@
 <div class="box">
-    <div *ngIf="playerTurn == 'First'"></div>
+    <div *ngIf="playerTurn == 'First'">
+        <div class="columns">
+            <div class="column">
+                <app-tile-card [wrapper]="wrapper" [key]="'TechRoad'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'TechWall1'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'TechMarket'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'TechNuke'"></app-tile-card>
+
+            </div>
+            <div class="column">
+                <app-tile-card [wrapper]="wrapper" [key]="'TechMine1'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'TechMine2'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'TechRefinery1'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'TechRefinery2'"></app-tile-card>
+            </div>
+            
+            <div class="column">
+                <app-tile-card [wrapper]="wrapper" [key]="'TechTurret1'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'TechTurret2'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'TechArtillery1'"></app-tile-card>
+                <app-tile-card [wrapper]="wrapper" [key]="'TechArtillery2'"></app-tile-card>
+            </div>
+
+        </div>
+    </div>
     <div *ngIf="playerTurn == 'Second'">
         <div class="columns">
             <div class="column">

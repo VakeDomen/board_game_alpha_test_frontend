@@ -58,6 +58,9 @@ export class GameComponent implements OnInit {
     }
 
     if (response.message[0] == "applyPhase") {
+      if (response.data) {
+        console.log(response);
+      }
       this.stateParser(response.data)
     }
 

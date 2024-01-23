@@ -64,7 +64,7 @@ export class TileCardComponent implements OnInit {
     if (key == 'TechMine1') return "assets/tech/mine-wagon.png";
     if (key == 'TechMine2') return "assets/tech/mine-wagon-1.png";
     if (key == 'TechNuke') return "assets/tech/nuclear-bomb.png";
-    if (key == 'TechWall1') return "assets/tech/stone-wall.png";
+    if (key == 'TechWall1') return "assets/tech/brick-wall.png";
     if (key == 'TechMarket') return "assets/tech/trade.png";
     if (key == 'TechBase') return "assets/tech/health-normal.png";
     if (key == 'BugBase1') return "assets/tech/nest-eggs.png";
