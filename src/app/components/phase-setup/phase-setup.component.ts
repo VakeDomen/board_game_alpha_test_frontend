@@ -24,14 +24,17 @@ export class PhaseSetupComponent implements OnChanges {
       return;
     }
 
+
+    const lastState = GameService.getLastState(this.wrapper);
     const display: DisplayTag[] = [];
-    if (GameService.isMyTurn(this.wrapper)) {
+    if (GameService.isMyTurn(this.wrapper) && lastState.move_que.length == 0) {
       display.push('setup');
       display.push('footprint');
     }
+
     const state: DisplayState = {
       display: display,
-      tileSelector: GameService.tryToGetLastState(this.wrapper)?.player_turn == 'First' ? 'TechBase' : 'BugBase1',
+      tileSelector: lastState.player_turn == 'First' ? 'TechBase' : 'BugBase1',
       tileId: null
     };
     if (!this.wrapper) {

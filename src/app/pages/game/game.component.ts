@@ -49,6 +49,13 @@ export class GameComponent implements OnInit {
   }
 
   private messageParser = (response: MessageResponse) => {
+    const error = JSON.parse(response.data)["Error"];
+    if (error) {
+      console.log("Error: ", error);
+      SocketService.sendMessage("undo", "GAME " + this.name + " Undo");
+    }
+
+
     if (response.message[0] == "state") {
       this.stateParser(response.data);
     }
@@ -196,7 +203,11 @@ export class GameComponent implements OnInit {
     if (AuthService.getName() == this.wrapper.game.player1) {
       tile.x = lastState.map.length - 1 - tile.x;
     }
-    SocketService.sendMessage("baseSetup", "GAME " + this.name + " BaseSetup " + tile.x + " " + tile.y)
+
+    if (lastState.move_que.length == 0) {
+      SocketService.sendMessage("baseSetup", "GAME " + this.name + " BaseSetup " + tile.x + " " + tile.y)
+    }
+
   }
 
 
