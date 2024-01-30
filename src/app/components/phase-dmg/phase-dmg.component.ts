@@ -30,7 +30,7 @@ export class PhaseDmgComponent implements OnChanges {
     }
     const state: DisplayState = {
       display: display,
-      tileSelector: GameService.tryToGetLastState(this.wrapper)?.player_turn == 'First' ? 'TechBase' : 'BugBase1',
+      tileSelector: null,
       tileId: null
     };
     if (!this.wrapper) {

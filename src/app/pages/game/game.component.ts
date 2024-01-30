@@ -174,6 +174,7 @@ export class GameComponent implements OnInit {
       this.handleTileClickMainPhase(tile);
     }
   }
+
   handleTileClickMainPhase(tile: Tile) {
     const lastState = GameService.tryToGetLastState(this.wrapper);;
     if (!this.wrapper || !GameService.isMyTurn(this.wrapper) ||  !lastState) {
@@ -183,6 +184,7 @@ export class GameComponent implements OnInit {
       tile.x = lastState.map.length - 1 - tile.x;
     }
 
+    
     // placed a tile
     if (this.wrapper.canvasState.display.includes("footprint")) {
       const tileSelector = this.wrapper.canvasState.tileSelector;
@@ -194,7 +196,17 @@ export class GameComponent implements OnInit {
         tile.x + 
         " " + 
         tile.y +
-        " 0")
+        " 0"
+      );
+      return;
+    }
+
+    if (tile.id) {
+      const selector = GameService.getTileTypeById(this.wrapper, tile.id);
+      this.wrapper.canvasState.tileId = tile.id;
+    }
+    if (!tile.id) {
+      this.wrapper.canvasState.tileId = null;
     }
   }
   

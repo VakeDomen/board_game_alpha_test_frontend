@@ -120,4 +120,48 @@ export class GameService {
       canvasState: wrapper.canvasState,
     } as GameWrapper
   }
+
+  static getBackgroundImageUrl(key: string): string {
+    if (key == 'TechRefinery1') return "assets/tech/furnace.png";
+    if (key == 'TechRefinery2') return "assets/tech/furnace-1.png";
+    if (key == 'TechRoad') return "assets/tech/road.png";
+    if (key == 'TechArtillery1') return "assets/tech/anti-aircraft-gun.png";
+    if (key == 'TechArtillery2') return "assets/tech/anti-aircraft-gun.png";
+    if (key == 'TechTurret1') return "assets/tech/turret.png";
+    if (key == 'TechTurret2') return "assets/tech/turret-1.png";
+    if (key == 'TechMine1') return "assets/tech/mine-wagon.png";
+    if (key == 'TechMine2') return "assets/tech/mine-wagon-1.png";
+    if (key == 'TechNuke') return "assets/tech/nuclear-bomb.png";
+    if (key == 'TechWall1') return "assets/tech/brick-wall.png";
+    if (key == 'TechMarket') return "assets/tech/trade.png";
+    if (key == 'TechBase') return "assets/general/health-normal.png";
+    if (key == 'BugBase1') return "assets/bug/nest-eggs.png";
+    if (key == 'BugBase2') return "assets/bug/nest-eggs1.png";
+    if (key == 'BugBase3') return "assets/bug/nest-eggs2.png";
+    if (key == 'BugSoldierLV1') return "assets/bug/maggot.png";
+    if (key == 'BugSoldierLV2') return "assets/bug/maggot-1.png";
+    if (key == 'BugSoldierLV3') return "assets/bug/maggot-2.png";
+    if (key == 'BugEliteMelee') return "assets/bug/alien-bug.png";
+    if (key == 'BugEliteRanged') return "assets/bug/alien-bug.png";
+    return "assets/general/health-normal.png";
+  }
+
+  static getTileTypeById(wrapper: GameWrapper, tileId: string) {
+    const state = GameService.getLastState(wrapper);
+    return state.tiles[tileId].tile_type;
+  }
+
+  static getImageUrl(wrapper: GameWrapper, tileId: string) {
+    return this.getBackgroundImageUrl(this.getTileTypeById(wrapper, tileId));
+  }
+
+  static getTileActiveCost(wrapper: GameWrapper, key: string) {
+    const selector = this.getTileTypeById(wrapper, key);
+    return wrapper.recepies[selector].activated_costs;
+  }
+
+  static isActivePlayersTile(wrapper: GameWrapper, id: string) {
+    const state = this.getLastState(wrapper);
+    return state.player_turn == state.tiles[id].owner;
+  }
 }

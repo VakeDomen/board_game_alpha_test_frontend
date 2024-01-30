@@ -1,4 +1,4 @@
-<div class="box">
+<div class="box" *ngIf="wrapper && wrapper.canvasState && !wrapper.canvasState.tileId">
     <div *ngIf="playerTurn == 'First'">
         <div class="columns">
             <div class="column">
@@ -37,4 +37,26 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="box" *ngIf="wrapper && wrapper.canvasState && wrapper.canvasState.tileId">
+    <h1 class="title is-3">Acivate ability/Upgrade of the tile:</h1>
+
+    <div *ngIf="!getTileActiveCost(wrapper.canvasState.tileId).length">
+        Nothing to activate
+    </div>
+
+    <div *ngIf="getTileActiveCost(wrapper.canvasState.tileId).length">
+        <div class="box resource-box mt-2" *ngFor="let resources of getTileActiveCost(wrapper.canvasState.tileId)">
+            <span *ngFor="let res of resources">
+                <img *ngIf="res == 'Egg'" class="resource-image" src="assets/bug/egg-eye.png" alt="Egg">
+                <img *ngIf="res == 'Corpse'" class="resource-image" src="assets/bug/alien-bug.png" alt="Giant Egg">
+                <img *ngIf="res == 'GiantEgg'" class="resource-image" src="assets/bug/alien-bug.png" alt="Giant Egg">
+                <img *ngIf="res == 'Gold'" class="resource-image" src="assets/tech/stone-pile.png" alt="Giant Egg">
+                <img *ngIf="res == 'Metal'" class="resource-image" src="assets/tech/metal-bar.png" alt="Giant Egg">
+            </span>
+        </div>
+    </div>
+
+    
 </div>

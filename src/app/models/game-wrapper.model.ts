@@ -13,4 +13,4 @@ export interface DisplayState {
     tileId: string | null,
 }
 
-export type DisplayTag = 'footprint' | 'range' | 'setup' | 'dmg' | 'main';
+export type DisplayTag = 'footprint' | 'range' | 'setup' | 'dmg' | 'main' | 'actives';

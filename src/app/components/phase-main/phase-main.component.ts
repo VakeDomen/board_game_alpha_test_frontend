@@ -30,7 +30,7 @@ export class PhaseMainComponent implements OnChanges {
     this.playerTurn = GameService.getPlayerTurn(this.wrapper);
     const display: DisplayTag[] = [];
     if (GameService.isMyTurn(this.wrapper)) {
-      display.push('main');
+      display.push('main', 'actives');
     }
     const state: DisplayState = {
       display: display,
@@ -63,6 +63,13 @@ export class PhaseMainComponent implements OnChanges {
     }
     return things;
     // this.wrapper.recepies.
+  }
+
+  public getTileActiveCost(key: string) {
+    if (!this.wrapper || !key) {
+      return [];
+    }
+    return GameService.getTileActiveCost(this.wrapper, key);
   }
 
 
