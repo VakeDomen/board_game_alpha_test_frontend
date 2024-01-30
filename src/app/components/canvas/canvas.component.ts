@@ -169,12 +169,22 @@ export class CanvasComponent implements OnChanges {
         image.onerror = reject;
       }));
     }
+
+    const image = new Image();
+    image.src = "assets/general/terrain.png";
+    loadedImages['terrain'] = image;
+    imageLoadPromises.push(new Promise((resolve, reject) => {
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+    }));
+
     await Promise.all(imageLoadPromises);
     return loadedImages;
   }
   private async drawGrid(map: string[][]): Promise<void> {
     if (!this.context || !this.wrapper) return;
 
+    this.drawBackground();
     this.drawTileFaces(map);
 
     if (this.wrapper.canvasState.display.includes('setup')) {
@@ -188,6 +198,22 @@ export class CanvasComponent implements OnChanges {
     if (this.wrapper.canvasState.display.includes('actives')) {
       this.drawActiveAbilityShine(map);
     }
+  }
+
+  private drawBackground() {
+    if (!this.context) return;
+    const image = this.preloadedImages["terrain"];
+    if (!image) {
+      return
+    }
+    this.context.globalAlpha = 1;
+    this.context.drawImage(
+      image,
+      0,
+      0,
+      this.gameCanvas.nativeElement.width,
+      this.gameCanvas.nativeElement.height
+    );
   }
 
   private drawActiveAbilityShine(map: string[][]) {
@@ -221,9 +247,7 @@ export class CanvasComponent implements OnChanges {
             );
             this.context.globalAlpha = prevAlpha;
           }
-
         }
-        
       }
     }
   }
@@ -327,8 +351,10 @@ export class CanvasComponent implements OnChanges {
             }
           }
         } else {
+          this.context.globalAlpha = 0.3
           this.context.fillStyle = 'lightgrey';
           this.context.fillRect(col * this.tileSize.width, row * this.tileSize.height, this.tileSize.width, this.tileSize.height);
+          this.context.globalAlpha = 1;
         }
 
         if (!coveredTiles.has(tileKey)) {

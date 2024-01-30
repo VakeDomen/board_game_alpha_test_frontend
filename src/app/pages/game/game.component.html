@@ -39,7 +39,7 @@
             <div *ngIf="myTurn">
                 <div class="level has-text-centered-mobile" >
                     <div class="level-left">
-                        <button class="button is-link is-outlined" (click)="undo()">Undo</button>
+                        <button *ngIf="hasAnythingToUndo()" class="button is-link is-outlined" (click)="undo()">Undo</button>
                     </div>
                     <div class="level-right">
                         <button class="button is-link" (click)="nextPhase()">Next Phase</button>

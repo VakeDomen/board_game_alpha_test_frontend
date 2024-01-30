@@ -214,6 +214,14 @@ export class GameComponent implements OnInit {
     SocketService.sendMessage("undo", "GAME " + this.name + " Undo");
   }
 
+  hasAnythingToUndo() {
+    const lastState = GameService.tryToGetLastState(this.wrapper);;
+    if (!this.wrapper || !GameService.isMyTurn(this.wrapper) ||  !lastState) {
+      return false;
+    }
+    return lastState.move_que.length > 0;
+  }
+
   nextPhase() {
     SocketService.sendMessage("nextPhase", "GAME " + this.name + " NextPhase");
   }
