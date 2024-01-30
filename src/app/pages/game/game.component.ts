@@ -27,6 +27,8 @@ export class GameComponent implements OnInit {
   public game: Game | undefined;
   public recepies: TileRecipes | undefined;
 
+  private refreshing: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -86,7 +88,13 @@ export class GameComponent implements OnInit {
     if (response.message[0] == "tilePlacement") {
       SocketService.sendMessage("applyPhase", "GAME " + this.name + " ApplyPhase")
     }
+
+    if (this.refreshing) {
+      setTimeout(() => SocketService.sendMessage("state", "GAME " + this.name + " GetState"), 500);
+    }
   }
+
+  
 
   recepiesParser(data: string) {
     this.recepies = JSON.parse(data)["TileRecepeies"] as TileRecipes;
@@ -118,7 +126,8 @@ export class GameComponent implements OnInit {
     this.playerTurn = GameService.getPlayerTurn(this.wrapper);
     this.labelPlayerTurn = this.getPlayerTurnLabel();
     this.myTurn = GameService.isMyTurn(this.wrapper);
-    
+    this.refreshing = !GameService.isMyTurn(this.wrapper);
+
     // revert possible already done moves on phase load
     // just to avoid wierd states
     const lastState = GameService.getLastState(this.wrapper);
@@ -127,6 +136,9 @@ export class GameComponent implements OnInit {
     } else {
       this.isReady = true;
     }
+
+
+    
   }
 
   getGameName(): string {
